@@ -10,21 +10,14 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('sending');
-
+    
         try {
-            const SERVICE_ID = 'YOUR_SERVICE_ID';
-            const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-            const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
-
-            if (SERVICE_ID === 'YOUR_SERVICE_ID') {
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-                setStatus('success');
-                setFormData({ name: '', email: '', message: '' });
-                setTimeout(() => setStatus(''), 4000);
-                return;
-            }
-
+            const SERVICE_ID = import.meta.env.VITE_EMAIL_SERVICE_ID;
+            const TEMPLATE_ID = import.meta.env.VITE_EMAIL_TEMPLATE_ID;
+            const PUBLIC_KEY = import.meta.env.VITE_EMAIL_PUBLIC_KEY;
+    
             const { default: emailjs } = await import('@emailjs/browser');
+    
             await emailjs.send(
                 SERVICE_ID,
                 TEMPLATE_ID,
@@ -36,10 +29,13 @@ const Contact = () => {
                 },
                 PUBLIC_KEY
             );
+    
             setStatus('success');
             setFormData({ name: '', email: '', message: '' });
+    
             setTimeout(() => setStatus(''), 4000);
-        } catch {
+    
+        } catch (error) {
             setStatus('error');
             setTimeout(() => setStatus(''), 4000);
         }
