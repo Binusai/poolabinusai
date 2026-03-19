@@ -14,7 +14,7 @@ const education = [
         institution: 'Sri Chaitanya Junior College',
         location: 'Chittoor, A.P',
         period: '2021 – 2023',
-        score: '94%',
+        score: 'Percentage: 94',
     },
     {
         degree: 'Secondary School',
