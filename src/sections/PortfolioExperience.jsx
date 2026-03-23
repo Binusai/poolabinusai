@@ -309,6 +309,7 @@ const useBinaryIntro = (canvasRef, onIntroComplete) => {
                 for (let i = 0; i < p2.length; i++) {
                     const p = p2[i];
                     if (Math.abs(p.x - cx) > hvw || Math.abs(p.y - cy) > hvh) continue;
+                    if (e > 1 && Math.random() < 0.25) p.char = Math.random() > 0.5 ? '1' : '0';
                     ctx.fillStyle = `rgba(255,255,255,${p.cA * fi})`;
                     ctx.fillText(p.char, p.x, p.y);
                 }
