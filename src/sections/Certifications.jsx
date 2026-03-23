@@ -364,6 +364,8 @@ const Certifications = () => {
                             fontSize: 'clamp(2.2rem, 5vw, 3.6rem)',
                             fontWeight: 700,
                             letterSpacing: '-0.03em',
+                            fontFamily: "'EB Garamond', Georgia, serif",
+                            fontStyle: 'italic',
                             color: '#1d1d1f',
                             lineHeight: 1.1,
                         }}
