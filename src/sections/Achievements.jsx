@@ -122,7 +122,7 @@ const shimmerCSS = `
 .achievement-card-wrapper::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0px;
     border-radius: 21px;
     background: conic-gradient(
         from var(--angle, 0deg),
@@ -204,7 +204,7 @@ const Achievements = () => {
                         maxWidth: '680px',
                         margin: '0 auto',
                         position: 'relative',
-                        padding: '2px',
+                        padding: '1px',
                         borderRadius: '21px',
                     }}
                 >
