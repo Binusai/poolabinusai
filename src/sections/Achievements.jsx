@@ -13,9 +13,9 @@ const useCelebrationParticles = (canvasRef, isActive) => {
         ];
         return {
             x: Math.random() * w,
-            y: Math.random() * h,          /* spawn ANYWHERE in the section */
+            y: Math.random() * h,
             vx: (Math.random() - 0.5) * 0.4,
-            vy: (Math.random() - 0.5) * 0.4, /* drift in any direction */
+            vy: (Math.random() - 0.5) * 0.4,
             size: 1.5 + Math.random() * 3,
             color: gold[Math.floor(Math.random() * gold.length)],
             alpha: 0.35 + Math.random() * 0.55,
@@ -46,20 +46,13 @@ const useCelebrationParticles = (canvasRef, isActive) => {
             ctx.clearRect(0, 0, w, h);
 
             if (!isActive) {
-                /* Section not in view — clear everything, stop rendering */
                 particlesRef.current = [];
                 animRef.current = requestAnimationFrame(draw);
                 return;
             }
 
-            /* Spawn new particles — spread across the whole section */
-            if (Math.random() < 0.7) {
-                particlesRef.current.push(createParticle(w, h));
-            }
-            /* Extra burst — spawn 2nd particle sometimes */
-            if (Math.random() < 0.3) {
-                particlesRef.current.push(createParticle(w, h));
-            }
+            if (Math.random() < 0.7) particlesRef.current.push(createParticle(w, h));
+            if (Math.random() < 0.3) particlesRef.current.push(createParticle(w, h));
 
             const alive = [];
             for (const p of particlesRef.current) {
@@ -105,13 +98,57 @@ const useCelebrationParticles = (canvasRef, isActive) => {
     }, [canvasRef, isActive, createParticle]);
 };
 
-/* ── Gold shimmer CSS keyframes (injected once) ──────────── */
+/* ── Gold shimmer + rotating border CSS ──────────────────── */
 const shimmerCSS = `
 @keyframes goldShimmer {
     0%   { background-position: -200% center; }
     100% { background-position: 200% center; }
 }
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes rotateBorder {
+    to { --angle: 360deg; }
+}
+
+.achievement-card-wrapper {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.achievement-card-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 21px;
+    background: conic-gradient(
+        from var(--angle, 0deg),
+        transparent 0deg,
+        transparent 60deg,
+        #ffd700 90deg,
+        #ffe87c 120deg,
+        #b8860b 150deg,
+        transparent 210deg,
+        transparent 360deg
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+}
+
+.achievement-card-wrapper:hover::before {
+    opacity: 1;
+    animation: rotateBorder 2.5s linear infinite;
+}
+
+.achievement-card-wrapper:hover {
+    transform: translateY(-8px);
+}
 `;
+
 if (typeof document !== 'undefined' && !document.getElementById('gold-shimmer-style')) {
     const s = document.createElement('style');
     s.id = 'gold-shimmer-style';
@@ -157,62 +194,76 @@ const Achievements = () => {
                     }}>Achievement</h2>
                 </motion.div>
 
+                {/* Card wrapper with rotating gold border */}
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                    className="achievement-card-wrapper"
                     style={{
-                        maxWidth: '680px', margin: '0 auto', padding: '40px',
-                        borderRadius: '20px', border: '1px solid #e5e5e7',
-                        background: '#fafafa',
+                        maxWidth: '680px',
+                        margin: '0 auto',
+                        position: 'relative',
+                        padding: '2px',
+                        borderRadius: '21px',
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
-                        <div style={{
-                            flexShrink: 0, width: 56, height: 56, borderRadius: '50%',
-                            background: '#f0f0f0', border: '1px solid #e5e5e7',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                            <span style={{ fontSize: '20px' }}>📄</span>
-                        </div>
-                        <div>
-                            <div style={{ marginBottom: '16px' }}>
-                                <span style={{
-                                    fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase',
-                                    padding: '4px 12px', borderRadius: '20px',
-                                    background: '#e8f5e9', color: '#2e7d32', fontWeight: 600,
-                                    border: '1px solid #c8e6c9',
-                                }}>Research Paper Accepted</span>
-                            </div>
-                            <h3 style={{
-                                fontSize: '20px', fontWeight: 600, color: '#1d1d1f',
-                                letterSpacing: '-0.02em', marginBottom: '12px',
-                            }}>IEEE NMIC 2026 Conference</h3>
-                            <p style={{ fontSize: '15px', color: '#86868b', lineHeight: 1.7, marginBottom: '16px' }}>
-                                Research paper on &quot;Multimodal Indian Language Identification Using Script Analysis,
-                                Textual Similarity, and Phoneme Representations&quot; accepted at the prestigious
-                                IEEE National Conference on Modern Information and Communication Technologies (NMIC 2026).
-                            </p>
-                            <p style={{ fontSize: '14px', color: '#a1a1a6', lineHeight: 1.7 }}>
-                                The paper presents a novel three-stream architecture for identifying 15 Indic languages
-                                from short, noisy, and code-mixed speech, achieving state-of-the-art accuracy of 93.47%
-                                and 93.2% Macro-F1.
-                            </p>
+                    {/* Inner card */}
+                    <div style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        borderRadius: '19px',
+                        border: '1px solid #e5e5e7',
+                        background: '#fafafa',
+                        padding: '40px',
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
                             <div style={{
-                                display: 'flex', gap: '32px', marginTop: '24px', paddingTop: '24px',
-                                borderTop: '1px solid #e5e5e7',
+                                flexShrink: 0, width: 56, height: 56, borderRadius: '50%',
+                                background: '#f0f0f0', border: '1px solid #e5e5e7',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
-                                <div>
-                                    <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Accuracy</p>
-                                    <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.47%</p>
+                                <span style={{ fontSize: '20px' }}>📄</span>
+                            </div>
+                            <div>
+                                <div style={{ marginBottom: '16px' }}>
+                                    <span style={{
+                                        fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase',
+                                        padding: '4px 12px', borderRadius: '20px',
+                                        background: '#e8f5e9', color: '#2e7d32', fontWeight: 600,
+                                        border: '1px solid #c8e6c9',
+                                    }}>Research Paper Accepted</span>
                                 </div>
-                                <div>
-                                    <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Languages</p>
-                                    <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>15</p>
-                                </div>
-                                <div>
-                                    <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Macro-F1</p>
-                                    <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.2%</p>
+                                <h3 style={{
+                                    fontSize: '20px', fontWeight: 600, color: '#1d1d1f',
+                                    letterSpacing: '-0.02em', marginBottom: '12px',
+                                }}>IEEE NMIC 2026 Conference</h3>
+                                <p style={{ fontSize: '15px', color: '#86868b', lineHeight: 1.7, marginBottom: '16px' }}>
+                                    Research paper on &quot;Multimodal Indian Language Identification Using Script Analysis,
+                                    Textual Similarity, and Phoneme Representations&quot; accepted at the prestigious
+                                    IEEE National Conference on Modern Information and Communication Technologies (NMIC 2026).
+                                </p>
+                                <p style={{ fontSize: '14px', color: '#a1a1a6', lineHeight: 1.7 }}>
+                                    The paper presents a novel three-stream architecture for identifying 15 Indic languages
+                                    from short, noisy, and code-mixed speech, achieving state-of-the-art accuracy of 93.47%
+                                    and 93.2% Macro-F1.
+                                </p>
+                                <div style={{
+                                    display: 'flex', gap: '32px', marginTop: '24px', paddingTop: '24px',
+                                    borderTop: '1px solid #e5e5e7',
+                                }}>
+                                    <div>
+                                        <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Accuracy</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.47%</p>
+                                    </div>
+                                    <div>
+                                        <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Languages</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>15</p>
+                                    </div>
+                                    <div>
+                                        <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Macro-F1</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.2%</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
