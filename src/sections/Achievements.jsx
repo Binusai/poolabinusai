@@ -186,6 +186,8 @@ const Achievements = () => {
                         fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700,
                         letterSpacing: '-0.03em',
                         background: 'linear-gradient(90deg, #b8860b 0%, #ffd700 25%, #fff8dc 50%, #ffd700 75%, #b8860b 100%)',
+                        fontFamily: "'EB Garamond', Georgia, serif",
+                        fontStyle: 'italic',
                         backgroundSize: '200% auto',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
