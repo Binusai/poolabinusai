@@ -154,6 +154,8 @@ const Projects = () => {
                     <h2 style={{
                         fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700,
                         letterSpacing: '-0.03em', color: '#1d1d1f',
+                        fontFamily: "'EB Garamond', Georgia, serif",
+                        fontStyle: 'italic',
                     }}>Featured Projects</h2>
                     <p style={{
                         fontSize: '17px', color: '#86868b', marginTop: '16px',
