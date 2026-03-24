@@ -3,7 +3,7 @@ import PortfolioExperience from './sections/PortfolioExperience';
 import Projects from './sections/Projects';
 import Achievements from './sections/Achievements';
 import Certifications from './sections/Certifications';
-import Education from './sections/Education';
+// import Education from './sections/Education';
 import Contact from './sections/Contact';
 
 function App() {
