@@ -10,16 +10,11 @@ function App() {
     return (
         <div className="min-h-screen">
             <Navbar />
-            {/* Dark section */}
-            <div className="bg-black text-[#f5f5f7]">
+            {/* PortfolioExperience manages its own bg color (black → white via GSAP) */}
+            <div>
                 <PortfolioExperience />
             </div>
-            {/* Black → White gradient transition */}
-            <div style={{
-                height: '200px',
-                background: 'linear-gradient(to bottom, #000000 0%, #ffffff 100%)',
-            }} />
-            {/* White section */}
+            {/* White section — starts immediately after PortfolioExperience which ends on white */}
             <div className="bg-white text-[#1d1d1f]">
                 <Projects />
                 <Achievements />
