@@ -24,7 +24,7 @@ function App() {
                 <Projects />
                 <Achievements />
                 <Certifications />
-                <Education />
+                {/* <Education /> */}
             </div>
             {/* Contact — has its own white→green gradient transition */}
             <Contact />
