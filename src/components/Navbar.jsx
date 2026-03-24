@@ -90,7 +90,7 @@ const Navbar = () => {
                         textTransform: 'uppercase', cursor: 'pointer', color: logoColor,
                         background: 'none', border: 'none', transition: 'color 0.5s',
                     }}
-                >BSP</button>
+                >PBS</button>
 
                 {/* Desktop nav */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}
