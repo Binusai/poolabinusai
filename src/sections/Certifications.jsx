@@ -14,7 +14,7 @@ const certifications = [
         issuer: 'NPTEL',
         date: "Oct '25",
         credentialLink: 'https://drive.google.com/file/d/1JGisSTxRJesw-cuYyZLXka2HEvJNwJuy/view',
-        logo: 'https://scontent.fixc4-3.fna.fbcdn.net/v/t39.30808-6/459919339_3497754870525293_6324508059614192566_n.png?stp=dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=0327a3&_nc_ohc=puobCK851lsQ7kNvwGbUIxP&_nc_oc=AdkCBiNJqelCnm7iZFT7CHOqoNUd24pX72W_iNCA-C3GUlgXlUWpnsJQubT5_5SfuXk&_nc_zt=23&_nc_ht=scontent.fixc4-3.fna&_nc_gid=hYQTR1ePlWuEGwPXo3ic4A&_nc_ss=8&oh=00_AfxUY8GBxVu7SkGhgWeu_6fi-n6Ba4UgyfzHc_JVf2hpYg&oe=69BB7259',
+        logo: 'https://sangamuniversity.ac.in/wp-content/uploads/2023/03/nptel.jpg',
     },
     {
         title: 'Computer Networking',
