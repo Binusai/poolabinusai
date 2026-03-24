@@ -43,8 +43,8 @@ const ProjectCard = ({ project, index, isInView }) => {
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.15 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
             className="group block"
             style={{ textDecoration: 'none' }}
@@ -139,24 +139,22 @@ const ProjectCard = ({ project, index, isInView }) => {
 
 const Projects = () => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: '-60px' });
+    const isInView = useInView(ref, { once: true, margin: '-20px' });
 
     return (
-        <section id="projects" ref={ref} style={{ background: '#ffffff', padding: '120px 0 100px' }}>
+        <section id="projects" ref={ref} style={{ background: '#ffffff', paddingTop: '80px' }}>
             <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 32px' }}>
                 {/* Section heading */}
                 <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0 }}
+                    animate={isInView ? { opacity: 1 } : {}}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     style={{ textAlign: 'center', marginBottom: '80px' }}
                 >
                     <h2 style={{
                         fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700,
                         letterSpacing: '-0.03em', color: '#1d1d1f',
-                        fontFamily: "'EB Garamond', Georgia, serif",
-                        fontStyle: 'italic',
-                    }}>Featured Projects</h2>
+                    }}>Featured Project</h2>
                     <p style={{
                         fontSize: '17px', color: '#86868b', marginTop: '16px',
                         maxWidth: '520px', margin: '16px auto 0', lineHeight: 1.6,
