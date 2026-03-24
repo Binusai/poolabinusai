@@ -773,9 +773,9 @@ const PortfolioExperience = () => {
                             ].map(([label, href], i, arr) => (
                                 <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                     <a href={href} target="_blank" rel="noopener noreferrer"
-                                        style={{ fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', textDecoration: 'none', transition: 'color 0.4s', cursor: 'pointer' }}
+                                        style={{ fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'color 0.4s', cursor: 'pointer' }}
                                         onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.9)'}
-                                        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.25)'}>
+                                        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}>
                                         {label}
                                     </a>
                                     {i < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.08)' }}>·</span>}
@@ -786,15 +786,55 @@ const PortfolioExperience = () => {
                             {[
                                 { label: 'Resume', href: '/resume.pdf', download: true },
                                 { label: 'Contact', href: '#contact', download: false },
-                            ].map(({ label, href, download }) => (
-                                <a key={label} href={href}
-                                    {...(download ? { download: true, target: '_blank' } : {})}
-                                    style={{ display: 'inline-block', padding: '0.75rem 2rem', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '8px', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'all 0.3s', cursor: 'pointer' }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'; e.currentTarget.style.color = 'white'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'transparent'; }}>
-                                    {label}
-                                </a>
-                            ))}
+                            ].map(({ label, href, download }) => {
+                                const isResume = label === 'Resume';
+
+                                return (
+                                    <a
+                                        key={label}
+                                        href={href}
+                                        {...(download ? { download: true, target: '_blank' } : {})}
+                                        style={{
+                                            display: 'inline-block',
+                                            padding: '0.75rem 2rem',
+                                            border: isResume
+                                                ? '1px solid black'
+                                                : '1px solid rgba(255,255,255,0.25)',
+                                            borderRadius: '8px',
+                                            fontSize: 12,
+                                            letterSpacing: '0.18em',
+                                            textTransform: 'uppercase',
+                                            color: isResume ? 'black' : 'rgba(255,255,255,0.7)',
+                                            background: isResume ? 'white' : 'transparent',
+                                            textDecoration: 'none',
+                                            transition: 'all 0.3s',
+                                            cursor: 'pointer',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (isResume) {
+                                                e.currentTarget.style.background = 'black';
+                                                e.currentTarget.style.color = 'white';
+                                            } else {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)';
+                                                e.currentTarget.style.color = 'white';
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (isResume) {
+                                                e.currentTarget.style.background = 'white';
+                                                e.currentTarget.style.color = 'black';
+                                            } else {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)';
+                                                e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                                                e.currentTarget.style.background = 'transparent';
+                                            }
+                                        }}
+                                    >
+                                        {label}
+                                    </a>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
