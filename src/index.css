@@ -111,3 +111,209 @@ h6 {
 .pin-spacer {
   overflow: hidden !important;
 }
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+.nav-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-desktop {
+  align-items: center;
+  gap: 40px;
+}
+
+@media (max-width: 767px) {
+  .nav-inner {
+    padding: 0 16px;
+  }
+}
+
+/* ── PortfolioExperience mobile panels ──────────────────────── */
+@media (max-width: 767px) {
+  .pe-hero,
+  .pe-about,
+  .pe-exp {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  .pe-hero .pe-panel,
+  .pe-about .pe-panel {
+    padding: 40px 20px 72px;
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.94) 50%,
+      rgba(0, 0, 0, 0.72) 78%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  .pe-hero {
+    align-items: flex-end !important;
+  }
+
+  .pe-about {
+    align-items: flex-end !important;
+  }
+
+  .pe-about .pe-panel {
+    max-height: 58vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 56px;
+  }
+
+  .cert-card-glow {
+    padding: 28px 22px 22px !important;
+    min-height: 220px !important;
+  }
+
+  .pe-exp {
+    align-items: flex-start !important;
+    padding-top: 72px;
+  }
+
+  .pe-exp .pe-panel {
+    padding: 16px 20px 56px !important;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.78) 100%
+    );
+  }
+
+  .pe-hero-actions {
+    flex-wrap: wrap;
+  }
+
+  .pe-hero-socials {
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem !important;
+  }
+
+  .pe-tech-title {
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 0.15em;
+    padding-top: 64px;
+  }
+
+  .pe-tech-title span {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    font-size: clamp(2.4rem, 14vw, 3.5rem) !important;
+    text-align: center;
+    width: 100%;
+  }
+
+  .pe-tech-circuit {
+    display: none !important;
+  }
+
+  .pe-tech-grid {
+    display: grid !important;
+  }
+
+  .pe-portrait img {
+    max-height: 42vh !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .pe-tech-grid {
+    display: none !important;
+  }
+}
+
+/* ── Section content mobile polish ──────────────────────────── */
+@media (max-width: 767px) {
+  #projects > div {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  #projects {
+    padding-top: 56px !important;
+  }
+
+  .project-card-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .project-color-box {
+    padding: 20px 16px 0 16px !important;
+    min-height: 260px !important;
+    border-radius: 16px !important;
+  }
+
+  #achievements {
+    padding: 64px 0 !important;
+  }
+
+  #achievements > div {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .achievement-inner {
+    padding: 24px 18px !important;
+  }
+
+  .achievement-body {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .achievement-stats {
+    gap: 16px !important;
+    flex-wrap: wrap;
+  }
+
+  #certifications {
+    padding: 64px 0 80px !important;
+  }
+
+  #certifications > div {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .cert-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  #education {
+    padding: 64px 0 !important;
+  }
+
+  #education > div {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .edu-card {
+    padding: 24px 20px 24px 28px !important;
+  }
+
+  #contact .contact-form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  #contact > div {
+    padding: 40px 16px 32px !important;
+  }
+}

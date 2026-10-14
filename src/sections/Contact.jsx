@@ -136,7 +136,7 @@ const Contact = () => {
                         onSubmit={handleSubmit}
                         style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
                     >
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="contact-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div>
                                 <label style={{
                                     fontSize: '10px', color: 'rgba(30, 30, 30, 0.6)', textTransform: 'uppercase',
