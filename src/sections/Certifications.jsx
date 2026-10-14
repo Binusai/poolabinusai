@@ -165,7 +165,6 @@ const CertCard = ({ cert, index, isInView }) => {
                 textDecoration: 'none',
                 cursor: 'pointer',
                 minHeight: '260px',
-                minWidth: 0,
                 perspective: '800px',
                 transformStyle: 'preserve-3d',
                 transform: isHovered
@@ -375,12 +374,11 @@ const Certifications = () => {
                     </h2>
                 </motion.div>
 
-                {/* 2×2 Grid — collapses to 1 col via .cert-grid mobile CSS */}
+                {/* 2×2 Grid */}
                 <div
-                    className="cert-grid"
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
                         gap: '40px',
                     }}
                 >
@@ -393,6 +391,15 @@ const Certifications = () => {
                         />
                     ))}
                 </div>
+
+                {/* Responsive fallback */}
+                <style>{`
+                    @media (max-width: 600px) {
+                        #certifications > div > div:last-of-type {
+                            grid-template-columns: 1fr !important;
+                        }
+                    }
+                `}</style>
             </div>
         </section>
     );

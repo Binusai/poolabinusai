@@ -78,7 +78,10 @@ const Navbar = () => {
                 borderBottom: `1px solid ${borderBar}`,
             }}
         >
-            <div className="nav-inner">
+            <div style={{
+                maxWidth: '1300px', margin: '0 auto', padding: '0 32px',
+                height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
                 {/* Logo */}
                 <button
                     onClick={() => scrollTo('home')}
@@ -86,12 +89,13 @@ const Navbar = () => {
                         fontSize: '15px', fontWeight: 600, letterSpacing: '0.15em',
                         textTransform: 'uppercase', cursor: 'pointer', color: logoColor,
                         background: 'none', border: 'none', transition: 'color 0.5s',
-                        zIndex: 1,
                     }}
                 >PBS</button>
 
-                {/* Desktop nav — class-only display so Tailwind can hide on mobile */}
-                <div className="nav-desktop hidden md:flex">
+                {/* Desktop nav */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}
+                    className="hidden md:flex"
+                >
                     {navItems.map((item) => (
                         <button
                             key={item.id}
@@ -119,9 +123,7 @@ const Navbar = () => {
                 {/* Mobile hamburger */}
                 <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="nav-burger md:hidden"
-                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                    aria-expanded={menuOpen}
+                    className="md:hidden"
                     style={{ color: logoColor, cursor: 'pointer', padding: '8px', background: 'none', border: 'none' }}
                 >
                     <div style={{ width: '20px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -145,17 +147,13 @@ const Navbar = () => {
             </div>
 
             {/* Mobile menu */}
-            <div
-                className="nav-mobile-panel md:hidden"
-                style={{
-                    overflow: 'hidden',
-                    transition: 'max-height 0.5s ease',
-                    maxHeight: menuOpen ? '420px' : '0',
-                }}
-            >
+            <div style={{
+                overflow: 'hidden', transition: 'max-height 0.5s',
+                maxHeight: menuOpen ? '400px' : '0',
+            }} className="md:hidden">
                 <div style={{
-                    padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: '4px',
-                    background: onWhite ? 'rgba(255,255,255,0.97)' : 'rgba(0,0,0,0.97)',
+                    padding: '20px 32px', display: 'flex', flexDirection: 'column', gap: '20px',
+                    background: onWhite ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)',
                     backdropFilter: 'blur(40px)',
                     borderTop: `1px solid ${borderBar}`,
                 }}>
@@ -164,11 +162,10 @@ const Navbar = () => {
                             key={item.id}
                             onClick={() => scrollTo(item.id)}
                             style={{
-                                fontSize: '15px', fontWeight: 500, textAlign: 'left',
+                                fontSize: '14px', fontWeight: 500, textAlign: 'left',
                                 cursor: 'pointer', letterSpacing: '0.04em',
                                 color: active === item.id ? textActive : textColor,
                                 background: 'none', border: 'none', transition: 'color 0.3s',
-                                padding: '12px 4px',
                             }}
                         >
                             {item.label}
