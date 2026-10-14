@@ -50,23 +50,24 @@ const ProjectCard = ({ project, index, isInView }) => {
             style={{ textDecoration: 'none' }}
         >
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div className="project-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '14px', fontWeight: 600, color: '#1d1d1f', letterSpacing: '-0.01em' }}>{project.num}</span>
-                    <span style={{ width: '24px', height: '1px', background: '#d1d1d6' }} />
+                    <span style={{ width: '24px', height: '1px', background: '#d1d1d6', flexShrink: 0 }} />
                     <span style={{ fontSize: '11px', letterSpacing: '0.1em', color: '#86868b', fontWeight: 500 }}>{project.category}</span>
                 </div>
                 {project.highlight && (
                     <span style={{
                         fontSize: '10px', letterSpacing: '0.08em', padding: '4px 12px',
                         borderRadius: '20px', background: '#f0f0f0', color: '#1d1d1f', fontWeight: 600,
+                        flexShrink: 0,
                     }}>★ IEEE</span>
                 )}
             </div>
 
             {/* Title */}
             <h3 style={{
-                fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 700, color: '#1d1d1f',
+                fontSize: 'clamp(1.35rem, 2.5vw, 2rem)', fontWeight: 700, color: '#1d1d1f',
                 letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: '20px',
             }}>{project.title}</h3>
 
@@ -81,7 +82,7 @@ const ProjectCard = ({ project, index, isInView }) => {
                 flexDirection: 'column',
                 transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s',
             }}
-                className="group-hover:scale-[1.02] group-hover:shadow-2xl"
+                className="project-color-box group-hover:scale-[1.02] group-hover:shadow-2xl"
             >
                 <p style={{
                     fontSize: '15px', color: 'rgba(255,255,255,0.92)', lineHeight: 1.7,

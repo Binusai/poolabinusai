@@ -566,7 +566,7 @@ const PortfolioExperience = () => {
         return () => window.removeEventListener('resize', resize);
     }, []);
 
-    /* GSAP scroll timeline */
+    /* GSAP scroll timeline — desktop vs mobile layouts via matchMedia */
     useEffect(() => {
         if (!introReady) return;
         const timer = setTimeout(() => {
@@ -575,15 +575,6 @@ const PortfolioExperience = () => {
                  * Timeline total duration = 10 units.
                  * Scroll distance = 8000px  →  each unit ≈ 800px of scroll.
                  *
-                 * Sections:
-                 *   0–1    : binary canvas fades out, portrait fades in
-                 *   1–3    : hero text visible
-                 *   3–4.5  : about section
-                 *   4.5–6.2: tech stack
-                 *   6.2–8  : freelancing / experience
-                 *   8–8.6  : everything fades out (smooth, not instant)
-                 *   8.6–10 : speed burst animation → bg turns white
-                 *
                  * BURST mapped to scroll progress:
                  *   BURST_START = 8.6/10 = 0.86
                  *   BURST_END   = 9.8/10 = 0.98
@@ -591,133 +582,168 @@ const PortfolioExperience = () => {
                 const BURST_START = 0.86;
                 const BURST_END = 0.98;
 
-                const tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top top', end: '+=8000',
-                        pin: true, scrub: 0.8, anticipatePin: 1,
-                        onLeave: () => {
-                            // When the pin releases, keep the white burst canvas covering the viewport.
-                            // The Projects section scrolls into position behind it.
-                            // After a short delay, fade out the white overlay to reveal Projects in place.
-                            const bc = burstRef.current;
-                            if (bc) {
-                                const ctx2 = bc.getContext('2d');
-                                ctx2.fillStyle = '#fff';
-                                ctx2.fillRect(0, 0, bc.width, bc.height);
-                                bc.style.opacity = '1';
-                                bc.style.transition = 'none';
-                                // Mark that we're in the overlay phase
-                                bc.dataset.overlay = 'true';
-                                // Fade out after Projects has scrolled into position
-                                setTimeout(() => {
-                                    bc.style.transition = 'opacity 0.5s ease-out';
-                                    bc.style.opacity = '0';
-                                    setTimeout(() => {
-                                        bc.style.transition = 'none';
-                                        bc.dataset.overlay = '';
-                                    }, 550);
-                                }, 300);
-                            }
-                        },
-                        onEnterBack: () => {
-                            // When scrolling back up into the pinned section, reset the burst canvas
-                            const bc = burstRef.current;
-                            if (bc) {
-                                bc.style.transition = 'none';
-                                bc.style.opacity = '0';
-                                bc.dataset.overlay = '';
-                            }
-                        },
-                        onUpdate: (self) => {
-                            const p = self.progress;
-
-                            // ── Section tracking ──
-                            let next;
-                            if (p < 0.15) next = 'none';
-                            else if (p < 0.38) next = 'hero';
-                            else if (p < 0.58) next = 'about';
-                            else if (p < 0.68) next = 'tech';
-                            else if (p < BURST_START) next = 'exp';
-                            else next = 'none';
-
-                            if (next !== activeSectionRef.current) {
-                                activeSectionRef.current = next;
-                                setActiveSection(next);
-                            }
-
-                            // ── Speed Burst canvas draw ──
-                            const bc = burstRef.current;
-                            if (!bc) return;
-
-                            // Don't interfere with the white overlay transition
-                            if (bc.dataset.overlay === 'true') return;
-
-                            // Before burst — hide canvas, black bg
-                            if (p < BURST_START) {
-                                bc.style.opacity = '0';
-                                bc.style.pointerEvents = 'none';
-                                sectionRef.current.style.backgroundColor = '#000000';
-                                return;
-                            }
-
-                            // After burst — hide canvas, white bg (stays white on reverse until we scroll back)
-                            if (p >= BURST_END) {
-                                bc.style.opacity = '0';
-                                bc.style.pointerEvents = 'none';
-                                sectionRef.current.style.backgroundColor = '#ffffff';
-                                return;
-                            }
-
-                            // During burst — show canvas and draw animation
-                            const effectProgress = Math.min(1, (p - BURST_START) / (BURST_END - BURST_START));
+                const createScrollTriggerConfig = () => ({
+                    trigger: sectionRef.current,
+                    start: 'top top', end: '+=8000',
+                    pin: true, scrub: 0.8, anticipatePin: 1,
+                    onLeave: () => {
+                        const bc = burstRef.current;
+                        if (bc) {
+                            const ctx2 = bc.getContext('2d');
+                            ctx2.fillStyle = '#fff';
+                            ctx2.fillRect(0, 0, bc.width, bc.height);
                             bc.style.opacity = '1';
+                            bc.style.transition = 'none';
+                            bc.dataset.overlay = 'true';
+                            setTimeout(() => {
+                                bc.style.transition = 'opacity 0.5s ease-out';
+                                bc.style.opacity = '0';
+                                setTimeout(() => {
+                                    bc.style.transition = 'none';
+                                    bc.dataset.overlay = '';
+                                }, 550);
+                            }, 300);
+                        }
+                    },
+                    onEnterBack: () => {
+                        const bc = burstRef.current;
+                        if (bc) {
+                            bc.style.transition = 'none';
+                            bc.style.opacity = '0';
+                            bc.dataset.overlay = '';
+                        }
+                    },
+                    onUpdate: (self) => {
+                        const p = self.progress;
 
-                            // Blend bg from black → white as burst fills screen (starts early so no gap)
-                            if (effectProgress > 0.35) {
-                                const bgBlend = Math.min(1, (effectProgress - 0.35) / 0.4);
-                                const v = Math.round(bgBlend * 255);
-                                sectionRef.current.style.backgroundColor = `rgb(${v},${v},${v})`;
-                            }
+                        let next;
+                        if (p < 0.15) next = 'none';
+                        else if (p < 0.38) next = 'hero';
+                        else if (p < 0.58) next = 'about';
+                        else if (p < 0.68) next = 'tech';
+                        else if (p < BURST_START) next = 'exp';
+                        else next = 'none';
 
-                            drawSpeedBurst(bc, effectProgress);
-                        },
+                        if (next !== activeSectionRef.current) {
+                            activeSectionRef.current = next;
+                            setActiveSection(next);
+                        }
+
+                        const bc = burstRef.current;
+                        if (!bc) return;
+                        if (bc.dataset.overlay === 'true') return;
+
+                        if (p < BURST_START) {
+                            bc.style.opacity = '0';
+                            bc.style.pointerEvents = 'none';
+                            sectionRef.current.style.backgroundColor = '#000000';
+                            return;
+                        }
+
+                        if (p >= BURST_END) {
+                            bc.style.opacity = '0';
+                            bc.style.pointerEvents = 'none';
+                            sectionRef.current.style.backgroundColor = '#ffffff';
+                            return;
+                        }
+
+                        const effectProgress = Math.min(1, (p - BURST_START) / (BURST_END - BURST_START));
+                        bc.style.opacity = '1';
+
+                        if (effectProgress > 0.35) {
+                            const bgBlend = Math.min(1, (effectProgress - 0.35) / 0.4);
+                            const v = Math.round(bgBlend * 255);
+                            sectionRef.current.style.backgroundColor = `rgb(${v},${v},${v})`;
+                        }
+
+                        drawSpeedBurst(bc, effectProgress);
                     },
                 });
 
-                // ── 0: Binary canvas out, portrait in ──
-                tl.to(cwRef.current, { opacity: 0, duration: 1, ease: 'power2.inOut' }, 0);
-                tl.fromTo(r1Ref.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 0);
+                const mm = gsap.matchMedia();
 
-                // ── 1: Portrait moves left, hero text appears ──
-                tl.to(pcRef.current, { left: '22%', width: '48vw', duration: 1.5, ease: 'power2.inOut' }, 1);
-                tl.fromTo(navRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8 }, 1.2);
-                tl.fromTo(heroRef.current, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 1 }, 1.5);
+                /* Desktop: side-by-side portrait + copy (unchanged) */
+                mm.add('(min-width: 768px)', () => {
+                    const tl = gsap.timeline({ scrollTrigger: createScrollTriggerConfig() });
 
-                // ── 3: Hero out, about in ──
-                tl.to(heroRef.current, { opacity: 0, y: -60, duration: 0.8 }, 3);
-                tl.to(r1Ref.current, { opacity: 0, duration: 0.8 }, 3);
-                tl.fromTo(r2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.8 }, 3);
-                tl.fromTo(aboutRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8 }, 3.2);
+                    tl.to(cwRef.current, { opacity: 0, duration: 1, ease: 'power2.inOut' }, 0);
+                    tl.fromTo(r1Ref.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 0);
 
-                // ── 4.5: About out, tech stack in ──
-                tl.to(aboutRef.current, { opacity: 0, duration: 0.7 }, 4.5);
-                tl.to(pcRef.current, { left: '50%', xPercent: -50, width: '40vw', duration: 1.2, ease: 'power2.inOut' }, 4.5);
-                tl.fromTo(techRef.current, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.8 }, 5.2);
+                    tl.to(pcRef.current, { left: '22%', width: '48vw', xPercent: 0, duration: 1.5, ease: 'power2.inOut' }, 1);
+                    tl.fromTo(navRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8 }, 1.2);
+                    tl.fromTo(heroRef.current, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 1 }, 1.5);
 
-                // ── 6.2: Tech out, experience in ──
-                tl.to(techRef.current, { opacity: 0, duration: 0.7 }, 6.2);
-                tl.to(pcRef.current, { left: '45%', xPercent: 0, width: '55vw', duration: 1.2, ease: 'power2.inOut' }, 6.2);
-                tl.fromTo(expRef.current, { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.8 }, 6.8);
+                    tl.to(heroRef.current, { opacity: 0, y: -60, duration: 0.8 }, 3);
+                    tl.to(r1Ref.current, { opacity: 0, duration: 0.8 }, 3);
+                    tl.fromTo(r2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.8 }, 3);
+                    tl.fromTo(aboutRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8 }, 3.2);
 
-                // ── 7.6: Gradual synchronized fadeout of ALL content ──
-                // Note: r2Ref is INSIDE pcRef, so we only fade pcRef (not both, which would double-fade the image)
-                tl.to(expRef.current, { opacity: 0, scale: 0.97, duration: 0.8, ease: 'power2.in' }, 7.6);
-                tl.to(pcRef.current, { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power2.in' }, 7.6);
-                tl.to(navRef.current, { opacity: 0, duration: 0.6, ease: 'power2.in' }, 7.8);
+                    tl.to(aboutRef.current, { opacity: 0, duration: 0.7 }, 4.5);
+                    tl.to(pcRef.current, { left: '50%', xPercent: -50, width: '40vw', duration: 1.2, ease: 'power2.inOut' }, 4.5);
+                    tl.fromTo(techRef.current, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.8 }, 5.2);
 
-                // ── 8.6–10: spacer for burst animation (handled by onUpdate) ──
-                tl.to({}, { duration: 1.4 }, 8.6);
+                    tl.to(techRef.current, { opacity: 0, duration: 0.7 }, 6.2);
+                    tl.to(pcRef.current, { left: '45%', xPercent: 0, width: '55vw', duration: 1.2, ease: 'power2.inOut' }, 6.2);
+                    tl.fromTo(expRef.current, { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.8 }, 6.8);
+
+                    tl.to(expRef.current, { opacity: 0, scale: 0.97, duration: 0.8, ease: 'power2.in' }, 7.6);
+                    tl.to(pcRef.current, { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power2.in' }, 7.6);
+                    tl.to(navRef.current, { opacity: 0, duration: 0.6, ease: 'power2.in' }, 7.8);
+
+                    tl.to({}, { duration: 1.4 }, 8.6);
+
+                    return () => tl.kill();
+                });
+
+                /* Mobile: portrait top/center, full-width copy panels */
+                mm.add('(max-width: 767px)', () => {
+                    const tl = gsap.timeline({ scrollTrigger: createScrollTriggerConfig() });
+
+                    tl.to(cwRef.current, { opacity: 0, duration: 1, ease: 'power2.inOut' }, 0);
+                    tl.fromTo(r1Ref.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 0);
+
+                    /* Shrink portrait toward top so copy has room below */
+                    tl.to(pcRef.current, {
+                        left: '50%', xPercent: -50, width: '72vw',
+                        top: '-10%', duration: 1.5, ease: 'power2.inOut',
+                    }, 1);
+                    tl.fromTo(navRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8 }, 1.2);
+                    tl.fromTo(heroRef.current, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 1 }, 1.5);
+
+                    tl.to(heroRef.current, { opacity: 0, y: -40, duration: 0.8 }, 3);
+                    tl.to(r1Ref.current, { opacity: 0, duration: 0.8 }, 3);
+                    tl.fromTo(r2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.8 }, 3);
+                    /* Push portrait higher so about copy sits on dark gradient */
+                    tl.to(pcRef.current, {
+                        left: '50%', xPercent: -50, width: '64vw',
+                        top: '-22%', duration: 0.9, ease: 'power2.inOut',
+                    }, 3);
+                    tl.fromTo(aboutRef.current, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.8 }, 3.2);
+
+                    tl.to(aboutRef.current, { opacity: 0, duration: 0.7 }, 4.5);
+                    /* Hide portrait during tech — icons + title need clear space */
+                    tl.to(pcRef.current, {
+                        left: '50%', xPercent: -50, width: '48vw',
+                        top: '18%', opacity: 0, duration: 1.0, ease: 'power2.inOut',
+                    }, 4.5);
+                    tl.fromTo(techRef.current, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.8 }, 5.2);
+
+                    tl.to(techRef.current, { opacity: 0, duration: 0.7 }, 6.2);
+                    /* Dim portrait behind experience copy */
+                    tl.to(pcRef.current, {
+                        left: '50%', xPercent: -50, width: '68vw',
+                        opacity: 0.18, top: '-8%', duration: 1.0, ease: 'power2.inOut',
+                    }, 6.2);
+                    tl.fromTo(expRef.current, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.8 }, 6.8);
+
+                    tl.to(expRef.current, { opacity: 0, scale: 0.97, duration: 0.8, ease: 'power2.in' }, 7.6);
+                    tl.to(pcRef.current, { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power2.in' }, 7.6);
+                    tl.to(navRef.current, { opacity: 0, duration: 0.6, ease: 'power2.in' }, 7.8);
+
+                    tl.to({}, { duration: 1.4 }, 8.6);
+
+                    return () => tl.kill();
+                });
             }, sectionRef);
             return () => ctx.revert();
         }, 200);
@@ -734,7 +760,7 @@ const PortfolioExperience = () => {
             <div ref={sectionRef} className="relative h-screen overflow-hidden bg-black" id="home">
 
                 {/* Portrait */}
-                <div ref={pcRef} className="absolute top-0 h-full flex items-center justify-center"
+                <div ref={pcRef} className="pe-portrait absolute top-0 h-full flex items-center justify-center"
                     style={{ left: '50%', transform: 'translateX(-50%)', width: '100vw', zIndex: 5, pointerEvents: 'none' }}>
                     <div ref={cwRef} className="absolute inset-0 z-[4]" style={{ pointerEvents: 'none' }}>
                         <canvas ref={canvasRef} className="w-full h-full" />
@@ -753,19 +779,19 @@ const PortfolioExperience = () => {
                 <div ref={navRef} className="absolute top-0 left-0 right-0 z-[30]" style={{ opacity: 0 }} />
 
                 {/* Hero */}
-                <div ref={heroRef} className="absolute right-0 top-0 h-full flex items-center"
+                <div ref={heroRef} className="pe-hero absolute right-0 top-0 h-full flex items-center"
                     style={{ width: '50%', zIndex: 20, opacity: 0, pointerEvents: activeSection === 'hero' ? 'auto' : 'none' }}>
-                    <div className="px-8 lg:px-16 xl:px-20">
+                    <div className="pe-panel px-8 lg:px-16 xl:px-20">
                         <p style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1.2rem', fontWeight: 500, color: '#00ff5e' }}>
                             Hello, I'm
                         </p>
-                        <h1 style={{ fontSize: 'clamp(3rem,6.5vw,6.5rem)', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 0.95, marginBottom: '1.2rem', color: 'white' }}>
+                        <h1 className="pe-hero-title" style={{ fontSize: 'clamp(2.4rem,6.5vw,6.5rem)', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 0.95, marginBottom: '1.2rem', color: 'white' }}>
                             Poola<br />Binu Sai
                         </h1>
-                        <div className="text-[clamp(1rem,1.6vw,1.3rem)] font-light mb-8 h-9 text-white/60">
+                        <div className="text-[clamp(0.95rem,1.6vw,1.3rem)] font-light mb-6 md:mb-8 min-h-9 text-white/60">
                             <TypewriterText />
                         </div>
-                        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2rem' }}>
+                        <div className="pe-hero-socials" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
                             {[
                                 ['GitHub', 'https://github.com/Binusai'],
                                 ['LinkedIn', 'https://www.linkedin.com/in/poola-binu-sai-805071290/'],
@@ -782,7 +808,7 @@ const PortfolioExperience = () => {
                                 </span>
                             ))}
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div className="pe-hero-actions" style={{ display: 'flex', gap: '0.75rem' }}>
                             {[
                                 { label: 'Resume', href: '/resume.pdf', download: true },
                                 { label: 'Contact', href: '#contact', download: false },
@@ -796,7 +822,7 @@ const PortfolioExperience = () => {
                                         {...(download ? { download: true, target: '_blank' } : {})}
                                         style={{
                                             display: 'inline-block',
-                                            padding: '0.75rem 2rem',
+                                            padding: '0.7rem 1.5rem',
                                             border: isResume
                                                 ? '1px solid black'
                                                 : '1px solid rgba(255,255,255,0.25)',
@@ -809,6 +835,7 @@ const PortfolioExperience = () => {
                                             textDecoration: 'none',
                                             transition: 'all 0.3s',
                                             cursor: 'pointer',
+                                            whiteSpace: 'nowrap',
                                         }}
                                         onMouseEnter={(e) => {
                                             if (isResume) {
@@ -840,17 +867,17 @@ const PortfolioExperience = () => {
                 </div>
 
                 {/* About */}
-                <div ref={aboutRef} id="about" className="absolute right-0 top-0 h-full flex items-center"
+                <div ref={aboutRef} id="about" className="pe-about absolute right-0 top-0 h-full flex items-center"
                     style={{ width: '52%', zIndex: 20, opacity: 0, pointerEvents: activeSection === 'about' ? 'auto' : 'none' }}>
-                    <div className="px-8 lg:px-16 xl:px-20">
+                    <div className="pe-panel px-8 lg:px-16 xl:px-20">
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'baseline', marginBottom: '0.8rem' }}>
-                            <span style={{ fontSize: 'clamp(1.8rem,3vw,2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'white', lineHeight: 1 }}>About</span>
-                            <span style={{ fontSize: 'clamp(1.8rem,3vw,2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#00ff5e', lineHeight: 1 }}>Binu Sai</span>
+                            <span style={{ fontSize: 'clamp(1.6rem,3vw,2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'white', lineHeight: 1 }}>About</span>
+                            <span style={{ fontSize: 'clamp(1.6rem,3vw,2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#00ff5e', lineHeight: 1 }}>Binu Sai</span>
                         </div>
-                        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', lineHeight: 1.85, marginBottom: '2rem', maxWidth: '680px' }}>
+                        <p style={{ fontSize: 'clamp(13px, 3.6vw, 15px)', color: 'rgba(255,255,255,0.45)', lineHeight: 1.75, marginBottom: '1.5rem', maxWidth: '680px' }}>
                             AI and Machine Learning Engineer focused on designing intelligent systems for real-world problems, including language identification and healthcare anomaly detection. Experienced in building and delivering full-stack applications for clients using Django and modern web technologies. Strong computer science fundamentals in DSA, operating systems, and data systems, with a creative approach to problem solving and UI/UX design to build efficient and user-focused solutions.
                         </p>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
                             <span style={{ fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Can Speak</span>
                             <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 11 }}>—</span>
                             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>English, Telugu, Hindi and Tamil</span>
@@ -862,29 +889,94 @@ const PortfolioExperience = () => {
                 <div ref={techRef} id="techstack" className="absolute inset-0"
                     style={{ zIndex: 6, opacity: 0, pointerEvents: activeSection === 'tech' ? 'auto' : 'none' }}>
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, pointerEvents: 'none', userSelect: 'none' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                        <div className="pe-tech-title" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
                             <span style={{ fontSize: 'clamp(4rem, 10vw, 9rem)', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1, color: 'white', textTransform: 'uppercase', marginLeft: '10vw' }}>TECH</span>
                             <span style={{ fontSize: 'clamp(4rem, 10vw, 9rem)', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1, color: 'white', textTransform: 'uppercase', marginRight: '6vw' }}>STACK</span>
                         </div>
                     </div>
-                    <TechCircuit />
+                    <div className="pe-tech-circuit">
+                        <TechCircuit />
+                    </div>
+                    {/* Mobile-only compact tech grid (circuit hidden via CSS) */}
+                    <div
+                        className="pe-tech-grid"
+                        style={{
+                            display: 'none',
+                            position: 'absolute',
+                            left: 16,
+                            right: 16,
+                            bottom: 48,
+                            top: '38%',
+                            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                            gap: '12px 8px',
+                            alignContent: 'start',
+                            zIndex: 8,
+                            overflowY: 'auto',
+                            WebkitOverflowScrolling: 'touch',
+                            paddingBottom: 8,
+                        }}
+                    >
+                        {[...leftTech, ...rightTech].map((tech) => (
+                            <a
+                                key={tech.name}
+                                href={tech.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                    textDecoration: 'none',
+                                    color: 'rgba(255,255,255,0.55)',
+                                }}
+                            >
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: '50%',
+                                    border: '1px solid rgba(255,255,255,0.22)',
+                                    background: 'rgba(8,8,8,0.85)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <img
+                                        src={tech.logo}
+                                        alt={tech.name}
+                                        width={22}
+                                        height={22}
+                                        style={{
+                                            objectFit: 'contain',
+                                            filter: tech.name === 'Django' ? 'invert(1) brightness(0.8)' : 'none',
+                                        }}
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.parentElement.innerHTML =
+                                                `<span style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:700">${tech.name.slice(0, 2).toUpperCase()}</span>`;
+                                        }}
+                                    />
+                                </div>
+                                <span style={{
+                                    fontSize: 8, letterSpacing: '0.08em', textTransform: 'uppercase',
+                                    textAlign: 'center', lineHeight: 1.2, fontWeight: 500,
+                                }}>{tech.name}</span>
+                            </a>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Experience */}
-                <div ref={expRef} id="experience" className="absolute left-0 top-0 h-full flex items-center"
+                <div ref={expRef} id="experience" className="pe-exp absolute left-0 top-0 h-full flex items-center"
                     style={{ width: '50%', zIndex: 20, opacity: 0, pointerEvents: activeSection === 'exp' ? 'auto' : 'none' }}>
-                    <div style={{ paddingLeft: '8vw', paddingRight: '3vw' }} className="w-full">
-                        <p style={{ fontSize: 20, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '1rem' }}>
+                    <div style={{ paddingLeft: '8vw', paddingRight: '3vw' }} className="pe-panel w-full">
+                        <p style={{ fontSize: 'clamp(12px, 3.5vw, 20px)', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '0.75rem' }}>
                             Freelancing
                         </p>
-                        <h2 style={{ fontSize: 'clamp(2.2rem,4vw,3.6rem)', fontWeight: 700, lineHeight: 1.05, marginBottom: '3.5rem', letterSpacing: '-0.03em' }}>
+                        <h2 style={{ fontSize: 'clamp(1.75rem,4vw,3.6rem)', fontWeight: 700, lineHeight: 1.05, marginBottom: 'clamp(1.5rem, 4vw, 3.5rem)', letterSpacing: '-0.03em' }}>
                             <span className="text-white">Work I've </span>
                             <span style={{ color: '#00ff5e' }}>shipped.</span>
                         </h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1.5rem, 3vw, 3rem)' }}>
                             {experiences.map((exp, i) => (
-                                <div key={i} style={{ borderLeft: '1px solid rgba(255,255,255,0.08)', paddingLeft: '1.8rem' }}>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.3, marginBottom: '0.5rem' }}>
+                                <div key={i} style={{ borderLeft: '1px solid rgba(255,255,255,0.08)', paddingLeft: '1.25rem' }}>
+                                    <h3 style={{ fontSize: 'clamp(1.05rem, 3.5vw, 1.25rem)', fontWeight: 600, lineHeight: 1.3, marginBottom: '0.5rem' }}>
                                         {exp.link ? (
                                             <a href={`https://${exp.link}`} target="_blank" rel="noopener noreferrer"
                                                 style={{ color: 'white', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.3s' }}
@@ -896,13 +988,13 @@ const PortfolioExperience = () => {
                                             <span style={{ color: 'white' }}>{exp.title}</span>
                                         )}
                                     </h3>
-                                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.38)', marginBottom: '1.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.38)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <span>{exp.company} · {exp.location}</span>
                                         <span style={{ color: 'rgba(255,255,255,0.25)' }}>—</span>
                                         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.52)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{exp.date}</span>
                                     </p>
                                     {exp.points.map((pt, j) => (
-                                        <p key={j} style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', lineHeight: 1.85, marginBottom: '0.7rem' }}>— {pt}</p>
+                                        <p key={j} style={{ fontSize: 'clamp(13px, 3.4vw, 14px)', color: 'rgba(255,255,255,0.48)', lineHeight: 1.7, marginBottom: '0.55rem' }}>— {pt}</p>
                                     ))}
                                 </div>
                             ))}

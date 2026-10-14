@@ -211,7 +211,7 @@ const Achievements = () => {
                     }}
                 >
                     {/* Inner card */}
-                    <div style={{
+                    <div className="achievement-inner" style={{
                         position: 'relative',
                         zIndex: 1,
                         borderRadius: '19px',
@@ -219,7 +219,7 @@ const Achievements = () => {
                         background: '#fafafa',
                         padding: '40px',
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
+                        <div className="achievement-body" style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
                             <div style={{
                                 flexShrink: 0, width: 56, height: 56, borderRadius: '50%',
                                 background: '#f0f0f0', border: '1px solid #e5e5e7',
@@ -227,44 +227,46 @@ const Achievements = () => {
                             }}>
                                 <span style={{ fontSize: '20px' }}>📄</span>
                             </div>
-                            <div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
                                 <div style={{ marginBottom: '16px' }}>
                                     <span style={{
                                         fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase',
                                         padding: '4px 12px', borderRadius: '20px',
                                         background: '#e8f5e9', color: '#2e7d32', fontWeight: 600,
                                         border: '1px solid #c8e6c9',
+                                        display: 'inline-block',
                                     }}>Research Paper Accepted</span>
                                 </div>
                                 <h3 style={{
-                                    fontSize: '20px', fontWeight: 600, color: '#1d1d1f',
+                                    fontSize: 'clamp(17px, 4.5vw, 20px)', fontWeight: 600, color: '#1d1d1f',
                                     letterSpacing: '-0.02em', marginBottom: '12px',
+                                    overflowWrap: 'anywhere',
                                 }}>IEEE NMIC 2026 Conference</h3>
-                                <p style={{ fontSize: '15px', color: '#86868b', lineHeight: 1.7, marginBottom: '16px' }}>
+                                <p style={{ fontSize: 'clamp(13px, 3.6vw, 15px)', color: '#86868b', lineHeight: 1.7, marginBottom: '16px', overflowWrap: 'anywhere' }}>
                                     Research paper on &quot;Multimodal Indian Language Identification Using Script Analysis,
                                     Textual Similarity, and Phoneme Representations&quot; accepted at the prestigious
                                     IEEE National Conference on Modern Information and Communication Technologies (NMIC 2026).
                                 </p>
-                                <p style={{ fontSize: '14px', color: '#a1a1a6', lineHeight: 1.7 }}>
+                                <p style={{ fontSize: 'clamp(13px, 3.5vw, 14px)', color: '#a1a1a6', lineHeight: 1.7, overflowWrap: 'anywhere' }}>
                                     The paper presents a novel three-stream architecture for identifying 15 Indic languages
                                     from short, noisy, and code-mixed speech, achieving state-of-the-art accuracy of 93.47%
                                     and 93.2% Macro-F1.
                                 </p>
-                                <div style={{
+                                <div className="achievement-stats" style={{
                                     display: 'flex', gap: '32px', marginTop: '24px', paddingTop: '24px',
                                     borderTop: '1px solid #e5e5e7',
                                 }}>
                                     <div>
                                         <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Accuracy</p>
-                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.47%</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: 300 }}>93.47%</p>
                                     </div>
                                     <div>
                                         <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Languages</p>
-                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>15</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: 300 }}>15</p>
                                     </div>
                                     <div>
                                         <p style={{ color: '#a1a1a6', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Macro-F1</p>
-                                        <p style={{ color: '#1d1d1f', fontSize: '24px', fontWeight: 300 }}>93.2%</p>
+                                        <p style={{ color: '#1d1d1f', fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: 300 }}>93.2%</p>
                                     </div>
                                 </div>
                             </div>
