@@ -250,8 +250,11 @@ const Contact = () => {
                             display: 'flex',
                             flexWrap: 'wrap',
                             justifyContent: 'center',
-                            gap: '28px',
+                            gap: '16px 24px',
                             fontSize: '12px',
+                            padding: '0 4px',
+                            wordBreak: 'break-word',
+                            textAlign: 'center',
                         }}
                     >
                         <a href="mailto:binusaipoola@gmail.com"

@@ -704,8 +704,8 @@ const PortfolioExperience = () => {
 
                     /* Shrink portrait toward top so copy has room below */
                     tl.to(pcRef.current, {
-                        left: '50%', xPercent: -50, width: '78vw',
-                        top: '-6%', duration: 1.5, ease: 'power2.inOut',
+                        left: '50%', xPercent: -50, width: '72vw',
+                        top: '-10%', duration: 1.5, ease: 'power2.inOut',
                     }, 1);
                     tl.fromTo(navRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8 }, 1.2);
                     tl.fromTo(heroRef.current, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 1 }, 1.5);
@@ -713,20 +713,26 @@ const PortfolioExperience = () => {
                     tl.to(heroRef.current, { opacity: 0, y: -40, duration: 0.8 }, 3);
                     tl.to(r1Ref.current, { opacity: 0, duration: 0.8 }, 3);
                     tl.fromTo(r2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.8 }, 3);
+                    /* Push portrait higher so about copy sits on dark gradient */
+                    tl.to(pcRef.current, {
+                        left: '50%', xPercent: -50, width: '64vw',
+                        top: '-22%', duration: 0.9, ease: 'power2.inOut',
+                    }, 3);
                     tl.fromTo(aboutRef.current, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.8 }, 3.2);
 
                     tl.to(aboutRef.current, { opacity: 0, duration: 0.7 }, 4.5);
+                    /* Hide portrait during tech — icons + title need clear space */
                     tl.to(pcRef.current, {
-                        left: '50%', xPercent: -50, width: '55vw',
-                        top: '0%', duration: 1.2, ease: 'power2.inOut',
+                        left: '50%', xPercent: -50, width: '48vw',
+                        top: '18%', opacity: 0, duration: 1.0, ease: 'power2.inOut',
                     }, 4.5);
                     tl.fromTo(techRef.current, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.8 }, 5.2);
 
                     tl.to(techRef.current, { opacity: 0, duration: 0.7 }, 6.2);
                     /* Dim portrait behind experience copy */
                     tl.to(pcRef.current, {
-                        left: '50%', xPercent: -50, width: '70vw',
-                        opacity: 0.22, top: '0%', duration: 1.0, ease: 'power2.inOut',
+                        left: '50%', xPercent: -50, width: '68vw',
+                        opacity: 0.18, top: '-8%', duration: 1.0, ease: 'power2.inOut',
                     }, 6.2);
                     tl.fromTo(expRef.current, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.8 }, 6.8);
 
